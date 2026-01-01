@@ -76,17 +76,17 @@ export class AICodeGenerationService {
     // Sanitize inputs more thoroughly to prevent prompt injection
     const sanitizedTitle = this.sanitizeInput(params.title, 100);
     const sanitizedDescription = this.sanitizeInput(params.description, 1000);
-    
+
     // Validate that sanitized inputs still meet minimum requirements
     if (sanitizedTitle.length < 3 || sanitizedDescription.length < 10) {
       throw new Error("Input contains invalid characters");
     }
-    
+
     return this.buildPromptTemplate(
       sanitizedTitle,
       sanitizedDescription,
       params.language,
-      params.difficulty
+      params.difficulty,
     );
   }
 
@@ -94,7 +94,7 @@ export class AICodeGenerationService {
     title: string,
     description: string,
     language: string,
-    difficulty: string
+    difficulty: string,
   ): string {
     return `Task: ${title}
 

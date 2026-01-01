@@ -63,10 +63,10 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     useState<SystemMetrics>(defaultMetrics);
   const [isLoading, setIsLoading] = useState(true);
   const [startTime, setStartTime] = useState<number | null>(null);
-  
+
   // Use ref to track the latest tasks for async operations
   const tasksRef = useRef<CodingTask[]>([]);
-  
+
   useEffect(() => {
     tasksRef.current = tasks;
   }, [tasks]);
@@ -277,7 +277,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     try {
       // Use ref to get the latest task data without side effects
       const task = tasksRef.current.find((t) => t.id === taskId);
-      
+
       if (!task) {
         throw new Error("Task not found");
       }
@@ -316,7 +316,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
         updateMetricsFromTasks(newTasks);
         return newTasks;
       });
-      
+
       addLog("notice", `Task completed successfully: ${taskData.title}`);
     } catch (error) {
       console.error("Error processing task:", error);
