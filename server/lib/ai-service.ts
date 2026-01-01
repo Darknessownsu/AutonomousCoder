@@ -15,6 +15,8 @@ interface CodeGenerationResult {
 
 export class AICodeGenerationService {
   private openai: OpenAI | null = null;
+  private readonly CODE_BLOCK_REGEX = /```[\w]*\n([\s\S]*?)```/;
+  private readonly EXPLANATION_REGEX = /EXPLANATION:\s*([\s\S]*?)$/i;
 
   constructor() {
     const apiKey = process.env.OPENAI_API_KEY;
@@ -60,33 +62,56 @@ export class AICodeGenerationService {
     }
   }
 
+  private sanitizeInput(input: string, maxLength: number): string {
+    // Remove HTML tags, control characters, and limit length
+    return input
+      .replace(/[<>]/g, "") // Remove angle brackets to prevent HTML injection
+      .replace(/[\x00-\x1F\x7F]/g, "") // Remove control characters
+      .replace(/[{}[\]]/g, "") // Remove braces and brackets that could break prompt structure
+      .trim()
+      .slice(0, maxLength);
+  }
+
   private buildPrompt(params: CodeGenerationParams): string {
-    // Sanitize inputs to prevent prompt injection
-    const sanitizedTitle = params.title
-      .replace(/[<>]/g, "")
-      .replace(/[\x00-\x1F\x7F]/g, "")
-      .trim();
-    const sanitizedDescription = params.description
-      .replace(/[<>]/g, "")
-      .replace(/[\x00-\x1F\x7F]/g, "")
-      .trim();
+    // Sanitize inputs more thoroughly to prevent prompt injection
+    const sanitizedTitle = this.sanitizeInput(params.title, 100);
+    const sanitizedDescription = this.sanitizeInput(params.description, 1000);
     
-    return `Task: ${sanitizedTitle}
+    // Validate that sanitized inputs still meet minimum requirements
+    if (sanitizedTitle.length < 3 || sanitizedDescription.length < 10) {
+      throw new Error("Input contains invalid characters");
+    }
+    
+    return this.buildPromptTemplate(
+      sanitizedTitle,
+      sanitizedDescription,
+      params.language,
+      params.difficulty
+    );
+  }
 
-Description: ${sanitizedDescription}
+  private buildPromptTemplate(
+    title: string,
+    description: string,
+    language: string,
+    difficulty: string
+  ): string {
+    return `Task: ${title}
 
-Programming Language: ${params.language}
-Difficulty Level: ${params.difficulty}
+Description: ${description}
+
+Programming Language: ${language}
+Difficulty Level: ${difficulty}
 
 Please generate code that:
 1. Implements the requirements described above
-2. Follows best practices for ${params.language}
-3. Is appropriate for ${params.difficulty} difficulty level
+2. Follows best practices for ${language}
+3. Is appropriate for ${difficulty} difficulty level
 4. Includes comments explaining key parts
 
 Format your response as:
 CODE:
-\`\`\`${params.language}
+\`\`\`${language}
 [your code here]
 \`\`\`
 
@@ -98,13 +123,13 @@ EXPLANATION:
     response: string,
     language: string,
   ): CodeGenerationResult {
-    // Extract code block
-    const codeMatch = response.match(/```[\w]*\n([\s\S]*?)```/);
+    // Extract code block using named regex
+    const codeMatch = response.match(this.CODE_BLOCK_REGEX);
     const code = codeMatch ? codeMatch[1].trim() : response;
 
     // Extract explanation (text after EXPLANATION: or after code block)
     let explanation = "";
-    const explanationMatch = response.match(/EXPLANATION:\s*([\s\S]*?)$/i);
+    const explanationMatch = response.match(this.EXPLANATION_REGEX);
     if (explanationMatch) {
       explanation = explanationMatch[1].trim();
     } else {

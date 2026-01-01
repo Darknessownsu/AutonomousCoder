@@ -4,6 +4,7 @@ import React, {
   useState,
   useEffect,
   useCallback,
+  useRef,
   ReactNode,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -62,6 +63,13 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     useState<SystemMetrics>(defaultMetrics);
   const [isLoading, setIsLoading] = useState(true);
   const [startTime, setStartTime] = useState<number | null>(null);
+  
+  // Use ref to track the latest tasks for async operations
+  const tasksRef = useRef<CodingTask[]>([]);
+  
+  useEffect(() => {
+    tasksRef.current = tasks;
+  }, [tasks]);
 
   useEffect(() => {
     loadData();
@@ -267,30 +275,19 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     addLog("debug", `Processing task: ${taskId}`);
 
     try {
-      // Get the latest task data from state
-      let taskData: {
-        title: string;
-        description: string;
-        language: ProgrammingLanguage;
-        difficulty: DifficultyLevel;
-      } | null = null;
+      // Use ref to get the latest task data without side effects
+      const task = tasksRef.current.find((t) => t.id === taskId);
       
-      setTasks((currentTasks) => {
-        const task = currentTasks.find((t) => t.id === taskId);
-        if (task) {
-          taskData = {
-            title: task.title,
-            description: task.description,
-            language: task.language,
-            difficulty: task.difficulty,
-          };
-        }
-        return currentTasks;
-      });
-
-      if (!taskData) {
+      if (!task) {
         throw new Error("Task not found");
       }
+
+      const taskData = {
+        title: task.title,
+        description: task.description,
+        language: task.language,
+        difficulty: task.difficulty,
+      };
 
       // Import the API dynamically to avoid circular dependencies
       const { generateCode } = await import("@/lib/api");
