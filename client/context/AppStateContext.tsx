@@ -267,43 +267,60 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     addLog("debug", `Processing task: ${taskId}`);
 
     try {
-      // Find the task to get its details
-      const task = tasks.find((t) => t.id === taskId);
-      if (!task) {
+      // Get the latest task data from state
+      let taskData: {
+        title: string;
+        description: string;
+        language: ProgrammingLanguage;
+        difficulty: DifficultyLevel;
+      } | null = null;
+      
+      setTasks((currentTasks) => {
+        const task = currentTasks.find((t) => t.id === taskId);
+        if (task) {
+          taskData = {
+            title: task.title,
+            description: task.description,
+            language: task.language,
+            difficulty: task.difficulty,
+          };
+        }
+        return currentTasks;
+      });
+
+      if (!taskData) {
         throw new Error("Task not found");
       }
 
       // Import the API dynamically to avoid circular dependencies
       const { generateCode } = await import("@/lib/api");
 
-      addLog("info", `Generating code for task: ${task.title}`);
+      addLog("info", `Generating code for task: ${taskData.title}`);
 
       // Call the actual AI code generation API
-      const result = await generateCode({
-        title: task.title,
-        description: task.description,
-        language: task.language,
-        difficulty: task.difficulty,
-      });
+      const result = await generateCode(taskData);
 
-      // Update the task with generated code
-      const newTasks = tasks.map((t) => {
-        if (t.id === taskId) {
-          return {
-            ...t,
-            status: "completed" as TaskStatus,
-            completedAt: Date.now(),
-            generatedCode: result.code,
-            codeExplanation: result.explanation,
-          };
-        }
-        return t;
-      });
+      // Update the task with generated code using functional update
+      setTasks((currentTasks) => {
+        const newTasks = currentTasks.map((t) => {
+          if (t.id === taskId) {
+            return {
+              ...t,
+              status: "completed" as TaskStatus,
+              completedAt: Date.now(),
+              generatedCode: result.code,
+              codeExplanation: result.explanation,
+            };
+          }
+          return t;
+        });
 
-      setTasks(newTasks);
-      await saveTasks(newTasks);
-      updateMetricsFromTasks(newTasks);
-      addLog("notice", `Task completed successfully: ${task.title}`);
+        saveTasks(newTasks);
+        updateMetricsFromTasks(newTasks);
+        return newTasks;
+      });
+      
+      addLog("notice", `Task completed successfully: ${taskData.title}`);
     } catch (error) {
       console.error("Error processing task:", error);
       await updateTaskStatus(taskId, "failed");
@@ -315,23 +332,25 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   };
 
   const updateTaskStatus = async (taskId: string, status: TaskStatus) => {
-    const newTasks = tasks.map((task) => {
-      if (task.id === taskId) {
-        return {
-          ...task,
-          status,
-          completedAt:
-            status === "completed" || status === "failed"
-              ? Date.now()
-              : undefined,
-        };
-      }
-      return task;
-    });
+    setTasks((currentTasks) => {
+      const newTasks = currentTasks.map((task) => {
+        if (task.id === taskId) {
+          return {
+            ...task,
+            status,
+            completedAt:
+              status === "completed" || status === "failed"
+                ? Date.now()
+                : undefined,
+          };
+        }
+        return task;
+      });
 
-    setTasks(newTasks);
-    await saveTasks(newTasks);
-    updateMetricsFromTasks(newTasks);
+      saveTasks(newTasks);
+      updateMetricsFromTasks(newTasks);
+      return newTasks;
+    });
   };
 
   const deleteTask = async (taskId: string) => {

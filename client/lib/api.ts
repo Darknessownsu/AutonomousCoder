@@ -45,5 +45,11 @@ export async function healthCheck(): Promise<{
   timestamp: string;
 }> {
   const response = await fetch(`${API_URL}/api/health`);
+  
+  if (!response.ok) {
+    throw new Error(`Health check failed: ${response.statusText}`);
+  }
+  
   return response.json();
+}
 }

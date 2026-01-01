@@ -61,9 +61,19 @@ export class AICodeGenerationService {
   }
 
   private buildPrompt(params: CodeGenerationParams): string {
-    return `Task: ${params.title}
+    // Sanitize inputs to prevent prompt injection
+    const sanitizedTitle = params.title
+      .replace(/[<>]/g, "")
+      .replace(/[\x00-\x1F\x7F]/g, "")
+      .trim();
+    const sanitizedDescription = params.description
+      .replace(/[<>]/g, "")
+      .replace(/[\x00-\x1F\x7F]/g, "")
+      .trim();
+    
+    return `Task: ${sanitizedTitle}
 
-Description: ${params.description}
+Description: ${sanitizedDescription}
 
 Programming Language: ${params.language}
 Difficulty Level: ${params.difficulty}

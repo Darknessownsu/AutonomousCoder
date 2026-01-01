@@ -23,8 +23,12 @@ export type User = typeof users.$inferSelect;
 export const generateCodeRequestSchema = z.object({
   title: z.string().min(3).max(100),
   description: z.string().min(10).max(1000),
-  language: z.string(),
-  difficulty: z.string(),
+  language: z.enum([
+    "swift", "python", "javascript", "typescript", "java", "kotlin",
+    "cpp", "c", "rust", "go", "ruby", "php", "bash", "shell", "sql",
+    "html", "css", "scala", "haskell", "lua", "perl", "r", "dart", "elixir"
+  ]),
+  difficulty: z.enum(["easy", "medium", "hard", "expert"]),
 });
 
 export const generateCodeResponseSchema = z.object({
