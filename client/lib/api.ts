@@ -1,9 +1,10 @@
 import Constants from "expo-constants";
 
-const API_URL = Constants.expoConfig?.extra?.apiUrl || 
-  (typeof window !== 'undefined' && window.location 
-    ? `${window.location.protocol}//${window.location.hostname}:5000` 
-    : 'http://localhost:5000');
+const API_URL =
+  Constants.expoConfig?.extra?.apiUrl ||
+  (typeof window !== "undefined" && window.location
+    ? `${window.location.protocol}//${window.location.hostname}:5000`
+    : "http://localhost:5000");
 
 interface GenerateCodeRequest {
   title: string;
@@ -18,7 +19,9 @@ interface GenerateCodeResponse {
   language: string;
 }
 
-export async function generateCode(params: GenerateCodeRequest): Promise<GenerateCodeResponse> {
+export async function generateCode(
+  params: GenerateCodeRequest,
+): Promise<GenerateCodeResponse> {
   const response = await fetch(`${API_URL}/api/generate-code`, {
     method: "POST",
     headers: {
@@ -28,14 +31,19 @@ export async function generateCode(params: GenerateCodeRequest): Promise<Generat
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: "Failed to generate code" }));
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to generate code" }));
     throw new Error(error.message || "Failed to generate code");
   }
 
   return response.json();
 }
 
-export async function healthCheck(): Promise<{ status: string; timestamp: string }> {
+export async function healthCheck(): Promise<{
+  status: string;
+  timestamp: string;
+}> {
   const response = await fetch(`${API_URL}/api/health`);
   return response.json();
 }

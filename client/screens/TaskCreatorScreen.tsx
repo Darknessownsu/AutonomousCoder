@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { View, StyleSheet, ScrollView, TextInput, Pressable, Alert, Platform } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TextInput,
+  Pressable,
+  Alert,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
@@ -41,7 +47,10 @@ export default function TaskCreatorScreen() {
     }
 
     if (description.trim().length < 10) {
-      Alert.alert("Invalid Description", "Description must be at least 10 characters long.");
+      Alert.alert(
+        "Invalid Description",
+        "Description must be at least 10 characters long.",
+      );
       return;
     }
 
@@ -49,8 +58,6 @@ export default function TaskCreatorScreen() {
     try {
       await addTask(title, description, language, difficulty);
       navigation.goBack();
-    } catch (error) {
-      Alert.alert("Error", "Failed to create task. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -66,11 +73,19 @@ export default function TaskCreatorScreen() {
         showsVerticalScrollIndicator={false}
       >
         {!isRunning && (
-          <Card style={[styles.warningCard, { backgroundColor: theme.warning + "20" }]}>
+          <Card
+            style={[
+              styles.warningCard,
+              { backgroundColor: theme.warning + "20" },
+            ]}
+          >
             <View style={styles.warningContent}>
               <Feather name="alert-triangle" size={20} color={theme.warning} />
-              <ThemedText style={[styles.warningText, { color: theme.warning }]}>
-                System is not running. Tasks will be queued until you start the system.
+              <ThemedText
+                style={[styles.warningText, { color: theme.warning }]}
+              >
+                System is not running. Tasks will be queued until you start the
+                system.
               </ThemedText>
             </View>
           </Card>
@@ -78,7 +93,7 @@ export default function TaskCreatorScreen() {
 
         <Card style={styles.formCard}>
           <ThemedText style={styles.sectionTitle}>Basic Information</ThemedText>
-          
+
           <View style={styles.inputGroup}>
             <ThemedText style={[styles.label, { color: theme.textSecondary }]}>
               Task Title
@@ -99,7 +114,9 @@ export default function TaskCreatorScreen() {
               maxLength={100}
               autoCapitalize="sentences"
             />
-            <ThemedText style={[styles.charCount, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.charCount, { color: theme.textSecondary }]}
+            >
               {title.length}/100
             </ThemedText>
           </View>
@@ -127,7 +144,9 @@ export default function TaskCreatorScreen() {
               maxLength={1000}
               textAlignVertical="top"
             />
-            <ThemedText style={[styles.charCount, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.charCount, { color: theme.textSecondary }]}
+            >
               {description.length}/1000
             </ThemedText>
           </View>
@@ -161,7 +180,10 @@ export default function TaskCreatorScreen() {
                   <ThemedText
                     style={[
                       styles.optionText,
-                      { color: language === lang.value ? theme.primary : theme.text },
+                      {
+                        color:
+                          language === lang.value ? theme.primary : theme.text,
+                      },
                     ]}
                   >
                     {lang.label}
@@ -188,7 +210,9 @@ export default function TaskCreatorScreen() {
                           ? theme.primary + "20"
                           : theme.backgroundTertiary,
                       borderColor:
-                        difficulty === level.value ? theme.primary : theme.border,
+                        difficulty === level.value
+                          ? theme.primary
+                          : theme.border,
                       opacity: pressed ? 0.8 : 1,
                     },
                   ]}
@@ -196,7 +220,12 @@ export default function TaskCreatorScreen() {
                   <ThemedText
                     style={[
                       styles.difficultyText,
-                      { color: difficulty === level.value ? theme.primary : theme.text },
+                      {
+                        color:
+                          difficulty === level.value
+                            ? theme.primary
+                            : theme.text,
+                      },
                     ]}
                   >
                     {level.label}
@@ -213,7 +242,9 @@ export default function TaskCreatorScreen() {
           style={({ pressed }) => [
             styles.submitButton,
             {
-              backgroundColor: isValid ? theme.primary : theme.backgroundTertiary,
+              backgroundColor: isValid
+                ? theme.primary
+                : theme.backgroundTertiary,
               opacity: pressed && isValid ? 0.8 : 1,
               transform: [{ scale: pressed && isValid ? 0.98 : 1 }],
             },

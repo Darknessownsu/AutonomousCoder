@@ -35,7 +35,7 @@ export default function TasksScreen() {
           style: "destructive",
           onPress: () => deleteTask(task.id),
         },
-      ]
+      ],
     );
   };
 
@@ -59,7 +59,8 @@ export default function TasksScreen() {
       <Feather name="file-plus" size={64} color={theme.textSecondary} />
       <ThemedText style={styles.emptyTitle}>No Tasks Yet</ThemedText>
       <ThemedText style={[styles.emptyMessage, { color: theme.textSecondary }]}>
-        Create your first coding task to get started with autonomous code generation.
+        Create your first coding task to get started with autonomous code
+        generation.
       </ThemedText>
       <Pressable
         onPress={() => navigation.navigate("TaskCreator")}
@@ -137,10 +138,19 @@ function TaskCard({
           <ThemedText style={styles.taskTitle} numberOfLines={1}>
             {task.title}
           </ThemedText>
-          <View style={[styles.statusBadge, { backgroundColor: statusColor + "20" }]}>
-            <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+          <View
+            style={[
+              styles.statusBadge,
+              { backgroundColor: statusColor + "20" },
+            ]}
+          >
+            <View
+              style={[styles.statusDot, { backgroundColor: statusColor }]}
+            />
             <ThemedText style={[styles.statusText, { color: statusColor }]}>
-              {task.status === "inProgress" ? "In Progress" : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+              {task.status === "inProgress"
+                ? "In Progress"
+                : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
             </ThemedText>
           </View>
         </View>
@@ -159,9 +169,14 @@ function TaskCard({
               {task.language.toUpperCase()}
             </ThemedText>
           </View>
-          <View style={[styles.tag, { backgroundColor: theme.backgroundTertiary }]}>
-            <ThemedText style={[styles.tagText, { color: theme.textSecondary }]}>
-              {task.difficulty.charAt(0).toUpperCase() + task.difficulty.slice(1)}
+          <View
+            style={[styles.tag, { backgroundColor: theme.backgroundTertiary }]}
+          >
+            <ThemedText
+              style={[styles.tagText, { color: theme.textSecondary }]}
+            >
+              {task.difficulty.charAt(0).toUpperCase() +
+                task.difficulty.slice(1)}
             </ThemedText>
           </View>
         </View>

@@ -7,7 +7,6 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
 import { Card } from "@/components/Card";
 import { useTheme } from "@/hooks/useTheme";
 import { useAppState } from "@/context/AppStateContext";
@@ -21,7 +20,8 @@ export default function DashboardScreen() {
   const { theme } = useTheme();
   const tabBarHeight = useBottomTabBarHeight();
   const headerHeight = useHeaderHeight();
-  const { isRunning, systemMetrics, startSystem, stopSystem, tasks } = useAppState();
+  const { isRunning, systemMetrics, startSystem, stopSystem, tasks } =
+    useAppState();
   const navigation = useNavigation<NavigationProp>();
 
   const recentTasks = tasks.slice(0, 3);
@@ -39,7 +39,10 @@ export default function DashboardScreen() {
       style={styles.container}
       contentContainerStyle={[
         styles.content,
-        { paddingTop: headerHeight + Spacing.xl, paddingBottom: tabBarHeight + Spacing.xl },
+        {
+          paddingTop: headerHeight + Spacing.xl,
+          paddingBottom: tabBarHeight + Spacing.xl,
+        },
       ]}
       showsVerticalScrollIndicator={false}
     >
@@ -64,7 +67,9 @@ export default function DashboardScreen() {
               </ThemedText>
             </View>
             {isRunning && (
-              <ThemedText style={[styles.uptimeText, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.uptimeText, { color: theme.textSecondary }]}
+              >
                 Uptime: {formatTimeInterval(systemMetrics.uptime)}
               </ThemedText>
             )}
@@ -137,14 +142,18 @@ export default function DashboardScreen() {
           ]}
         >
           <Feather name="plus-circle" size={20} color="#FFFFFF" />
-          <ThemedText style={styles.actionButtonText}>Create New Task</ThemedText>
+          <ThemedText style={styles.actionButtonText}>
+            Create New Task
+          </ThemedText>
         </Pressable>
       </Card>
 
       <Card style={styles.recentTasksCard}>
         <ThemedText style={styles.sectionTitle}>Recent Tasks</ThemedText>
         {recentTasks.length === 0 ? (
-          <ThemedText style={[styles.emptyText, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.emptyText, { color: theme.textSecondary }]}
+          >
             No tasks yet. Create your first task to get started.
           </ThemedText>
         ) : (
@@ -197,13 +206,21 @@ function TaskRow({ task, theme }: { task: any; theme: any }) {
           {task.title}
         </ThemedText>
         <View style={styles.taskMeta}>
-          <View style={[styles.languageTag, { backgroundColor: theme.primary + "33" }]}>
+          <View
+            style={[
+              styles.languageTag,
+              { backgroundColor: theme.primary + "33" },
+            ]}
+          >
             <ThemedText style={[styles.languageText, { color: theme.primary }]}>
               {task.language.toUpperCase()}
             </ThemedText>
           </View>
           <ThemedText
-            style={[styles.statusLabel, { color: statusColors[task.status] || theme.textSecondary }]}
+            style={[
+              styles.statusLabel,
+              { color: statusColors[task.status] || theme.textSecondary },
+            ]}
           >
             {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
           </ThemedText>

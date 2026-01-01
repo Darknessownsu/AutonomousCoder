@@ -12,23 +12,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/generate-code", async (req, res) => {
     try {
       const validation = generateCodeRequestSchema.safeParse(req.body);
-      
+
       if (!validation.success) {
         const validationError = fromError(validation.error);
-        return res.status(400).json({ 
+        return res.status(400).json({
           error: "Invalid request",
-          message: validationError.toString()
+          message: validationError.toString(),
         });
       }
 
       const result = await aiService.generateCode(validation.data);
-      
+
       res.json(result);
     } catch (error) {
       console.error("Error generating code:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to generate code",
-        message: error instanceof Error ? error.message : "Unknown error"
+        message: error instanceof Error ? error.message : "Unknown error",
       });
     }
   });

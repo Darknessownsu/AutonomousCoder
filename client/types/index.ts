@@ -24,7 +24,10 @@ export type ProgrammingLanguage =
   | "dart"
   | "elixir";
 
-export const PROGRAMMING_LANGUAGES: { value: ProgrammingLanguage; label: string }[] = [
+export const PROGRAMMING_LANGUAGES: {
+  value: ProgrammingLanguage;
+  label: string;
+}[] = [
   { value: "swift", label: "Swift" },
   { value: "python", label: "Python" },
   { value: "javascript", label: "JavaScript" },

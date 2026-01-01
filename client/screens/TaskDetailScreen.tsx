@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { View, StyleSheet, ScrollView, Pressable, Alert, Clipboard } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  Clipboard,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRoute, type RouteProp } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
@@ -69,8 +75,15 @@ export default function TaskDetailScreen() {
         <Card style={styles.card}>
           <View style={styles.headerRow}>
             <ThemedText style={styles.title}>{task.title}</ThemedText>
-            <View style={[styles.statusBadge, { backgroundColor: statusColor + "20" }]}>
-              <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+            <View
+              style={[
+                styles.statusBadge,
+                { backgroundColor: statusColor + "20" },
+              ]}
+            >
+              <View
+                style={[styles.statusDot, { backgroundColor: statusColor }]}
+              />
               <ThemedText style={[styles.statusText, { color: statusColor }]}>
                 {task.status === "inProgress"
                   ? "In Progress"
@@ -80,33 +93,55 @@ export default function TaskDetailScreen() {
           </View>
 
           <View style={styles.metaRow}>
-            <View style={[styles.tag, { backgroundColor: theme.primary + "20" }]}>
+            <View
+              style={[styles.tag, { backgroundColor: theme.primary + "20" }]}
+            >
               <Feather name="code" size={12} color={theme.primary} />
               <ThemedText style={[styles.tagText, { color: theme.primary }]}>
                 {task.language.toUpperCase()}
               </ThemedText>
             </View>
-            <View style={[styles.tag, { backgroundColor: theme.backgroundTertiary }]}>
-              <Feather name="bar-chart-2" size={12} color={theme.textSecondary} />
-              <ThemedText style={[styles.tagText, { color: theme.textSecondary }]}>
-                {task.difficulty.charAt(0).toUpperCase() + task.difficulty.slice(1)}
+            <View
+              style={[
+                styles.tag,
+                { backgroundColor: theme.backgroundTertiary },
+              ]}
+            >
+              <Feather
+                name="bar-chart-2"
+                size={12}
+                color={theme.textSecondary}
+              />
+              <ThemedText
+                style={[styles.tagText, { color: theme.textSecondary }]}
+              >
+                {task.difficulty.charAt(0).toUpperCase() +
+                  task.difficulty.slice(1)}
               </ThemedText>
             </View>
           </View>
 
           <View style={[styles.section, { borderTopColor: theme.border }]}>
-            <ThemedText style={[styles.sectionLabel, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.sectionLabel, { color: theme.textSecondary }]}
+            >
               Description
             </ThemedText>
-            <ThemedText style={styles.description}>{task.description}</ThemedText>
+            <ThemedText style={styles.description}>
+              {task.description}
+            </ThemedText>
           </View>
 
           <View style={styles.dateRow}>
-            <ThemedText style={[styles.dateLabel, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.dateLabel, { color: theme.textSecondary }]}
+            >
               Created: {formatDate(task.createdAt)}
             </ThemedText>
             {task.completedAt && (
-              <ThemedText style={[styles.dateLabel, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.dateLabel, { color: theme.textSecondary }]}
+              >
                 Completed: {formatDate(task.completedAt)}
               </ThemedText>
             )}
@@ -120,7 +155,9 @@ export default function TaskDetailScreen() {
               <Feather name="info" size={20} color={theme.primary} />
               <ThemedText style={styles.cardTitle}>Explanation</ThemedText>
             </View>
-            <ThemedText style={[styles.explanation, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.explanation, { color: theme.textSecondary }]}
+            >
               {task.codeExplanation}
             </ThemedText>
           </Card>
@@ -157,9 +194,16 @@ export default function TaskDetailScreen() {
                 </ThemedText>
               </Pressable>
             </View>
-            <View style={[styles.codeContainer, { backgroundColor: theme.backgroundTertiary }]}>
+            <View
+              style={[
+                styles.codeContainer,
+                { backgroundColor: theme.backgroundTertiary },
+              ]}
+            >
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <ThemedText style={styles.code}>{task.generatedCode}</ThemedText>
+                <ThemedText style={styles.code}>
+                  {task.generatedCode}
+                </ThemedText>
               </ScrollView>
             </View>
           </Card>
@@ -172,12 +216,18 @@ export default function TaskDetailScreen() {
               <Feather
                 name={task.status === "failed" ? "x-circle" : "clock"}
                 size={48}
-                color={task.status === "failed" ? theme.error : theme.textSecondary}
+                color={
+                  task.status === "failed" ? theme.error : theme.textSecondary
+                }
               />
               <ThemedText style={styles.noCodeTitle}>
-                {task.status === "failed" ? "Code Generation Failed" : "No Code Generated"}
+                {task.status === "failed"
+                  ? "Code Generation Failed"
+                  : "No Code Generated"}
               </ThemedText>
-              <ThemedText style={[styles.noCodeMessage, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.noCodeMessage, { color: theme.textSecondary }]}
+              >
                 {task.status === "failed"
                   ? "There was an error generating code for this task."
                   : task.status === "pending"
