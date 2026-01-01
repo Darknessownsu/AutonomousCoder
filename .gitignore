@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+
+# Production
+build/
+dist/
+server_dist/
+static-build/
+
+# Expo
+.expo/
+.expo-shared/
+web-build/
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local
+.local/
+
+# Temporary files
+tmp/
+temp/
+*.tmp

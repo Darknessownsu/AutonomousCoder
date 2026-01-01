@@ -2,11 +2,13 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import MainTabNavigator from "@/navigation/MainTabNavigator";
 import TaskCreatorScreen from "@/screens/TaskCreatorScreen";
+import TaskDetailScreen from "@/screens/TaskDetailScreen";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
 
 export type RootStackParamList = {
   Main: undefined;
   TaskCreator: undefined;
+  TaskDetail: { taskId: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -27,6 +29,13 @@ export default function RootStackNavigator() {
         options={{
           presentation: "modal",
           headerTitle: "New Task",
+        }}
+      />
+      <Stack.Screen
+        name="TaskDetail"
+        component={TaskDetailScreen}
+        options={{
+          headerTitle: "Task Details",
         }}
       />
     </Stack.Navigator>

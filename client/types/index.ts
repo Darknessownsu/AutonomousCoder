@@ -76,6 +76,8 @@ export interface CodingTask {
   status: TaskStatus;
   createdAt: number;
   completedAt?: number;
+  generatedCode?: string;
+  codeExplanation?: string;
 }
 
 export interface SystemMetrics {

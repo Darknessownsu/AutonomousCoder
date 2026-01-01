@@ -111,8 +111,10 @@ function TaskCard({
   onDelete: () => void;
   onCancel: () => void;
 }) {
+  const navigation = useNavigation<NavigationProp>();
   const statusColor = getStatusColor(task.status);
   const canCancel = task.status === "pending" || task.status === "inProgress";
+  const hasGeneratedCode = task.status === "completed" && task.generatedCode;
 
   const formatDate = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -122,6 +124,10 @@ function TaskCard({
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  const handleViewCode = () => {
+    navigation.navigate("TaskDetail", { taskId: task.id });
   };
 
   return (
@@ -165,6 +171,20 @@ function TaskCard({
       </View>
 
       <View style={[styles.taskActions, { borderTopColor: theme.border }]}>
+        {hasGeneratedCode && (
+          <Pressable
+            onPress={handleViewCode}
+            style={({ pressed }) => [
+              styles.actionButton,
+              { opacity: pressed ? 0.6 : 1 },
+            ]}
+          >
+            <Feather name="code" size={18} color={theme.success} />
+            <ThemedText style={[styles.actionText, { color: theme.success }]}>
+              View Code
+            </ThemedText>
+          </Pressable>
+        )}
         {canCancel && (
           <Pressable
             onPress={onCancel}

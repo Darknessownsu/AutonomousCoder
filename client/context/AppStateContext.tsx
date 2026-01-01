@@ -252,17 +252,49 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     await updateTaskStatus(taskId, "inProgress");
     addLog("debug", `Processing task: ${taskId}`);
 
-    const processingTime = Math.random() * 5000 + 3000;
-    setTimeout(async () => {
-      const success = Math.random() > 0.1;
-      if (success) {
-        await updateTaskStatus(taskId, "completed");
-        addLog("notice", `Task completed successfully: ${taskId}`);
-      } else {
-        await updateTaskStatus(taskId, "failed");
-        addLog("error", `Task failed: ${taskId}`);
+    try {
+      // Find the task to get its details
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) {
+        throw new Error("Task not found");
       }
-    }, processingTime);
+
+      // Import the API dynamically to avoid circular dependencies
+      const { generateCode } = await import("@/lib/api");
+      
+      addLog("info", `Generating code for task: ${task.title}`);
+      
+      // Call the actual AI code generation API
+      const result = await generateCode({
+        title: task.title,
+        description: task.description,
+        language: task.language,
+        difficulty: task.difficulty,
+      });
+
+      // Update the task with generated code
+      const newTasks = tasks.map((t) => {
+        if (t.id === taskId) {
+          return {
+            ...t,
+            status: "completed" as TaskStatus,
+            completedAt: Date.now(),
+            generatedCode: result.code,
+            codeExplanation: result.explanation,
+          };
+        }
+        return t;
+      });
+
+      setTasks(newTasks);
+      await saveTasks(newTasks);
+      updateMetricsFromTasks(newTasks);
+      addLog("notice", `Task completed successfully: ${task.title}`);
+    } catch (error) {
+      console.error("Error processing task:", error);
+      await updateTaskStatus(taskId, "failed");
+      addLog("error", `Task failed: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
   };
 
   const updateTaskStatus = async (taskId: string, status: TaskStatus) => {
