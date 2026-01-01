@@ -84,7 +84,7 @@ done
 
 **Recommendation for Swift 6:**
 ```swift
-.enableUpcomingFeature("StrictConcurrency=complete")
+.enableUpcomingFeature("StrictConcurrency")
 ```
 
 **Or simply remove it** since strict concurrency is the default in Swift 6.
@@ -175,7 +175,9 @@ let package = Package(
 ```swift
 .package(url: "...", exact: "1.5.0")
 // or
-.package(url: "...", from: "1.5.0", upTo: "2.0.0")
+.package(url: "...", "1.5.0"..<"2.0.0")
+// or
+.package(url: "...", .upToNextMajor(from: "1.5.0"))
 ```
 
 ### 6. **Add .swiftpm to .gitignore**
