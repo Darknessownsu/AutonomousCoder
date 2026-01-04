@@ -35,7 +35,7 @@ export default function TasksScreen() {
           style: "destructive",
           onPress: () => deleteTask(task.id),
         },
-      ]
+      ],
     );
   };
 
@@ -59,7 +59,8 @@ export default function TasksScreen() {
       <Feather name="file-plus" size={64} color={theme.textSecondary} />
       <ThemedText style={styles.emptyTitle}>No Tasks Yet</ThemedText>
       <ThemedText style={[styles.emptyMessage, { color: theme.textSecondary }]}>
-        Create your first coding task to get started with autonomous code generation.
+        Create your first coding task to get started with autonomous code
+        generation.
       </ThemedText>
       <Pressable
         onPress={() => navigation.navigate("TaskCreator")}
@@ -111,8 +112,10 @@ function TaskCard({
   onDelete: () => void;
   onCancel: () => void;
 }) {
+  const navigation = useNavigation<NavigationProp>();
   const statusColor = getStatusColor(task.status);
   const canCancel = task.status === "pending" || task.status === "inProgress";
+  const hasGeneratedCode = task.status === "completed" && task.generatedCode;
 
   const formatDate = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -124,6 +127,10 @@ function TaskCard({
     });
   };
 
+  const handleViewCode = () => {
+    navigation.navigate("TaskDetail", { taskId: task.id });
+  };
+
   return (
     <Card style={styles.taskCard}>
       <View style={styles.taskHeader}>
@@ -131,10 +138,19 @@ function TaskCard({
           <ThemedText style={styles.taskTitle} numberOfLines={1}>
             {task.title}
           </ThemedText>
-          <View style={[styles.statusBadge, { backgroundColor: statusColor + "20" }]}>
-            <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+          <View
+            style={[
+              styles.statusBadge,
+              { backgroundColor: statusColor + "20" },
+            ]}
+          >
+            <View
+              style={[styles.statusDot, { backgroundColor: statusColor }]}
+            />
             <ThemedText style={[styles.statusText, { color: statusColor }]}>
-              {task.status === "inProgress" ? "In Progress" : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+              {task.status === "inProgress"
+                ? "In Progress"
+                : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
             </ThemedText>
           </View>
         </View>
@@ -153,9 +169,14 @@ function TaskCard({
               {task.language.toUpperCase()}
             </ThemedText>
           </View>
-          <View style={[styles.tag, { backgroundColor: theme.backgroundTertiary }]}>
-            <ThemedText style={[styles.tagText, { color: theme.textSecondary }]}>
-              {task.difficulty.charAt(0).toUpperCase() + task.difficulty.slice(1)}
+          <View
+            style={[styles.tag, { backgroundColor: theme.backgroundTertiary }]}
+          >
+            <ThemedText
+              style={[styles.tagText, { color: theme.textSecondary }]}
+            >
+              {task.difficulty.charAt(0).toUpperCase() +
+                task.difficulty.slice(1)}
             </ThemedText>
           </View>
         </View>
@@ -165,6 +186,20 @@ function TaskCard({
       </View>
 
       <View style={[styles.taskActions, { borderTopColor: theme.border }]}>
+        {hasGeneratedCode && (
+          <Pressable
+            onPress={handleViewCode}
+            style={({ pressed }) => [
+              styles.actionButton,
+              { opacity: pressed ? 0.6 : 1 },
+            ]}
+          >
+            <Feather name="code" size={18} color={theme.success} />
+            <ThemedText style={[styles.actionText, { color: theme.success }]}>
+              View Code
+            </ThemedText>
+          </Pressable>
+        )}
         {canCancel && (
           <Pressable
             onPress={onCancel}

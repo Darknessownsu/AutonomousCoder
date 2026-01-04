@@ -1,4 +1,12 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  ReactNode,
+} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   CodingTask,
@@ -23,7 +31,12 @@ interface AppState {
   systemMetrics: SystemMetrics;
   startSystem: () => Promise<void>;
   stopSystem: () => Promise<void>;
-  addTask: (title: string, description: string, language: ProgrammingLanguage, difficulty: DifficultyLevel) => Promise<void>;
+  addTask: (
+    title: string,
+    description: string,
+    language: ProgrammingLanguage,
+    difficulty: DifficultyLevel,
+  ) => Promise<void>;
   updateTaskStatus: (taskId: string, status: TaskStatus) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
   addLog: (level: LogEntry["level"], message: string) => void;
@@ -46,12 +59,21 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   const [isRunning, setIsRunning] = useState(false);
   const [tasks, setTasks] = useState<CodingTask[]>([]);
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [systemMetrics, setSystemMetrics] = useState<SystemMetrics>(defaultMetrics);
+  const [systemMetrics, setSystemMetrics] =
+    useState<SystemMetrics>(defaultMetrics);
   const [isLoading, setIsLoading] = useState(true);
   const [startTime, setStartTime] = useState<number | null>(null);
 
+  // Use ref to track the latest tasks for async operations
+  const tasksRef = useRef<CodingTask[]>([]);
+
+  useEffect(() => {
+    tasksRef.current = tasks;
+  }, [tasks]);
+
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -115,9 +137,8 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       avgTime = totalTime / completed.length;
     }
 
-    const successRate = taskList.length > 0 
-      ? completed.length / taskList.length 
-      : 0;
+    const successRate =
+      taskList.length > 0 ? completed.length / taskList.length : 0;
 
     setSystemMetrics((prev) => ({
       ...prev,
@@ -150,7 +171,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     try {
       await AsyncStorage.setItem(
         STORAGE_KEYS.SYSTEM_STATE,
-        JSON.stringify({ isRunning: running, startTime: start })
+        JSON.stringify({ isRunning: running, startTime: start }),
       );
     } catch (error) {
       console.error("Error saving system state:", error);
@@ -178,7 +199,8 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     setStartTime(now);
     setSystemMetrics((prev) => ({
       ...prev,
-      activeAgents: tasks.filter((t) => t.status === "inProgress").length > 0 ? 3 : 1,
+      activeAgents:
+        tasks.filter((t) => t.status === "inProgress").length > 0 ? 3 : 1,
       uptime: 0,
     }));
     await saveSystemState(true, now);
@@ -210,7 +232,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     title: string,
     description: string,
     language: ProgrammingLanguage,
-    difficulty: DifficultyLevel
+    difficulty: DifficultyLevel,
   ) => {
     if (!title.trim() || !description.trim()) {
       throw new Error("Title and description are required");
@@ -252,34 +274,80 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     await updateTaskStatus(taskId, "inProgress");
     addLog("debug", `Processing task: ${taskId}`);
 
-    const processingTime = Math.random() * 5000 + 3000;
-    setTimeout(async () => {
-      const success = Math.random() > 0.1;
-      if (success) {
-        await updateTaskStatus(taskId, "completed");
-        addLog("notice", `Task completed successfully: ${taskId}`);
-      } else {
-        await updateTaskStatus(taskId, "failed");
-        addLog("error", `Task failed: ${taskId}`);
+    try {
+      // Use ref to get the latest task data without side effects
+      const task = tasksRef.current.find((t) => t.id === taskId);
+
+      if (!task) {
+        throw new Error("Task not found");
       }
-    }, processingTime);
+
+      const taskData = {
+        title: task.title,
+        description: task.description,
+        language: task.language,
+        difficulty: task.difficulty,
+      };
+
+      // Import the API dynamically to avoid circular dependencies
+      const { generateCode } = await import("@/lib/api");
+
+      addLog("info", `Generating code for task: ${taskData.title}`);
+
+      // Call the actual AI code generation API
+      const result = await generateCode(taskData);
+
+      // Update the task with generated code using functional update
+      setTasks((currentTasks) => {
+        const newTasks = currentTasks.map((t) => {
+          if (t.id === taskId) {
+            return {
+              ...t,
+              status: "completed" as TaskStatus,
+              completedAt: Date.now(),
+              generatedCode: result.code,
+              codeExplanation: result.explanation,
+            };
+          }
+          return t;
+        });
+
+        saveTasks(newTasks);
+        updateMetricsFromTasks(newTasks);
+        return newTasks;
+      });
+
+      addLog("notice", `Task completed successfully: ${taskData.title}`);
+    } catch (error) {
+      console.error("Error processing task:", error);
+      await updateTaskStatus(taskId, "failed");
+      addLog(
+        "error",
+        `Task failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
+    }
   };
 
   const updateTaskStatus = async (taskId: string, status: TaskStatus) => {
-    const newTasks = tasks.map((task) => {
-      if (task.id === taskId) {
-        return {
-          ...task,
-          status,
-          completedAt: status === "completed" || status === "failed" ? Date.now() : undefined,
-        };
-      }
-      return task;
-    });
+    setTasks((currentTasks) => {
+      const newTasks = currentTasks.map((task) => {
+        if (task.id === taskId) {
+          return {
+            ...task,
+            status,
+            completedAt:
+              status === "completed" || status === "failed"
+                ? Date.now()
+                : undefined,
+          };
+        }
+        return task;
+      });
 
-    setTasks(newTasks);
-    await saveTasks(newTasks);
-    updateMetricsFromTasks(newTasks);
+      saveTasks(newTasks);
+      updateMetricsFromTasks(newTasks);
+      return newTasks;
+    });
   };
 
   const deleteTask = async (taskId: string) => {

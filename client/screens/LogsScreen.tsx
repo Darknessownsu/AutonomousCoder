@@ -34,11 +34,15 @@ export default function LogsScreen() {
     return (
       <View style={[styles.logEntry, { borderBottomColor: theme.border }]}>
         <View style={styles.logHeader}>
-          <View style={[styles.levelIndicator, { backgroundColor: levelColor }]} />
+          <View
+            style={[styles.levelIndicator, { backgroundColor: levelColor }]}
+          />
           <ThemedText style={[styles.logLevel, { color: levelColor }]}>
             {item.level.toUpperCase()}
           </ThemedText>
-          <ThemedText style={[styles.timestamp, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.timestamp, { color: theme.textSecondary }]}
+          >
             {formatTime(item.timestamp)}
           </ThemedText>
         </View>
@@ -62,7 +66,9 @@ export default function LogsScreen() {
   return (
     <ThemedView style={styles.container}>
       {logs.length > 0 && (
-        <View style={[styles.header, { paddingTop: headerHeight + Spacing.md }]}>
+        <View
+          style={[styles.header, { paddingTop: headerHeight + Spacing.md }]}
+        >
           <ThemedText style={[styles.logCount, { color: theme.textSecondary }]}>
             {logs.length} log entries
           </ThemedText>
@@ -87,7 +93,8 @@ export default function LogsScreen() {
         contentContainerStyle={[
           styles.listContent,
           {
-            paddingTop: logs.length > 0 ? Spacing.md : headerHeight + Spacing.xl,
+            paddingTop:
+              logs.length > 0 ? Spacing.md : headerHeight + Spacing.xl,
             paddingBottom: tabBarHeight + Spacing.xl,
           },
           logs.length === 0 && styles.emptyList,

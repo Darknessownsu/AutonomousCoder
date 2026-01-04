@@ -24,12 +24,17 @@ export default function MonitorScreen() {
         <View
           style={[
             styles.emptyContainer,
-            { paddingTop: headerHeight + Spacing.xl, paddingBottom: tabBarHeight + Spacing.xl },
+            {
+              paddingTop: headerHeight + Spacing.xl,
+              paddingBottom: tabBarHeight + Spacing.xl,
+            },
           ]}
         >
           <Feather name="activity" size={64} color={theme.textSecondary} />
           <ThemedText style={styles.emptyTitle}>System Not Running</ThemedText>
-          <ThemedText style={[styles.emptyMessage, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.emptyMessage, { color: theme.textSecondary }]}
+          >
             Start the system from the Dashboard to view monitoring data.
           </ThemedText>
         </View>
@@ -42,7 +47,10 @@ export default function MonitorScreen() {
       style={styles.container}
       contentContainerStyle={[
         styles.content,
-        { paddingTop: headerHeight + Spacing.xl, paddingBottom: tabBarHeight + Spacing.xl },
+        {
+          paddingTop: headerHeight + Spacing.xl,
+          paddingBottom: tabBarHeight + Spacing.xl,
+        },
       ]}
       showsVerticalScrollIndicator={false}
     >
@@ -87,14 +95,21 @@ export default function MonitorScreen() {
         <ThemedText style={styles.sectionTitle}>Self-Improvement</ThemedText>
         <View style={styles.progressContainer}>
           <View style={styles.progressHeader}>
-            <ThemedText style={[styles.progressLabel, { color: theme.textSecondary }]}>
+            <ThemedText
+              style={[styles.progressLabel, { color: theme.textSecondary }]}
+            >
               Success Rate
             </ThemedText>
             <ThemedText style={styles.progressValue}>
               {(systemMetrics.improvementSuccessRate * 100).toFixed(1)}%
             </ThemedText>
           </View>
-          <View style={[styles.progressBar, { backgroundColor: theme.backgroundTertiary }]}>
+          <View
+            style={[
+              styles.progressBar,
+              { backgroundColor: theme.backgroundTertiary },
+            ]}
+          >
             <View
               style={[
                 styles.progressFill,
@@ -172,7 +187,9 @@ function AgentCard({
       style={[
         styles.agentCard,
         {
-          backgroundColor: isActive ? theme.primary + "15" : theme.backgroundTertiary,
+          backgroundColor: isActive
+            ? theme.primary + "15"
+            : theme.backgroundTertiary,
           borderColor: isActive ? theme.primary + "40" : "transparent",
         },
       ]}
